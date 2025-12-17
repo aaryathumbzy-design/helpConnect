@@ -1,14 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Mail, Lock, User, Phone, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 
 const Signup = () => {
   const navigate = useNavigate();
+  const { signUp, user, loading: authLoading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -17,16 +20,57 @@ const Signup = () => {
     confirmPassword: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (!authLoading && user) {
+      navigate("/");
+    }
+  }, [user, authLoading, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!formData.name.trim() || !formData.email.trim() || !formData.password.trim()) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords don't match!");
       return;
     }
-    // Simulate signup
-    toast.success("Account created successfully!");
-    navigate("/login");
+
+    if (formData.password.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
+
+    setLoading(true);
+
+    const { error } = await signUp(formData.email, formData.password, formData.name);
+
+    setLoading(false);
+
+    if (error) {
+      if (error.message.includes("already registered")) {
+        toast.error("An account with this email already exists");
+      } else if (error.message.includes("invalid")) {
+        toast.error("Please enter a valid email address");
+      } else {
+        toast.error(error.message);
+      }
+    } else {
+      toast.success("Account created! Please check your email to confirm, or sign in directly if email confirmation is disabled.");
+      navigate("/login");
+    }
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex bg-background">
@@ -71,6 +115,7 @@ const Signup = () => {
                   className="pl-10 h-12"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  maxLength={100}
                   required
                 />
               </div>
@@ -146,8 +191,8 @@ const Signup = () => {
               </div>
             </div>
 
-            <Button type="submit" variant="hero" className="w-full" size="lg">
-              Create Account
+            <Button type="submit" variant="hero" className="w-full" size="lg" disabled={loading}>
+              {loading ? "Creating Account..." : "Create Account"}
             </Button>
           </form>
 
