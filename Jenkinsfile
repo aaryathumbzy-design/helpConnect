@@ -51,8 +51,8 @@ spec:
 
     environment {
         // 🔐 Supabase (Vite build-time variables)
-        VITE_SUPABASE_PUBLISHABLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bmp0Y3B1dG5iemtjbHJodWlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5Nzc1NTAsImV4cCI6MjA4MTU1MzU1MH0.6ZgFMzJ0-WogJVxtMXBpuP2aOxewMxa0VrklHsx8owg"
         VITE_SUPABASE_URL="https://jynjtcputnbzkclrhuip.supabase.co"
+        VITE_SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5bmp0Y3B1dG5iemtjbHJodWlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU5Nzc1NTAsImV4cCI6MjA4MTU1MzU1MH0.6ZgFMzJ0-WogJVxtMXBpuP2aOxewMxa0VrklHsx8owg"
 
         // 📦 Image details
         IMAGE_NAME = "helpconnect-frontend"
@@ -80,10 +80,10 @@ spec:
         stage('SonarQube Analysis') {
             steps {
                 container('sonar-scanner') {
-                    withCredentials([string(credentialsId: 'sonar-token-2401202', variable: 'SONAR_TOKEN')]) {
+                    withCredentials([string(credentialsId: 'sonar-token-helpconnect', variable: 'SONAR_TOKEN')]) {
                         sh """
                             sonar-scanner \
-                              -Dsonar.projectKey=2401202-helpconnect \
+                              -Dsonar.projectKey=2401202_HelpConnect \
                               -Dsonar.host.url=http://my-sonarqube-sonarqube.sonarqube.svc.cluster.local:9000 \
                               -Dsonar.token=$SONAR_TOKEN \
                               -Dsonar.sources=src \
