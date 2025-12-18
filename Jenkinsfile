@@ -121,12 +121,12 @@ spec:
         }
 
         stage('Deploy to Kubernetes') {
-            steps {
-                container('kubectl') {
-                    dir('k8s') {
-                        sh '''
-                            kubectl apply -f deployment.yaml -n 2401202
-                        '''
+           steps {
+           container('kubectl') {
+             dir('k8s-deployment') {
+                sh '''
+                    kubectl apply -f deployment.yaml -n 2401202
+                '''
                     }
                 }
             }
